@@ -22,6 +22,7 @@ class ValidateTokenWithAuthService
                 'Authorization' => $authHeader
             ])->get(env('AUTH_SERVICE_URL') . '/me');
 
+
             if ($response->status() !== 200) {
                 return response()->json(['error' => 'Unauthorized - invalid token'], 401);
             }

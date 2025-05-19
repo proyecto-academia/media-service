@@ -28,6 +28,29 @@ Route::middleware('auth.remote')->group(function () {
             ]);
         },
     ]);
+
+    Route::get('/tests3', [
+        'uses' => function () {
+            Storage::disk('s3')->put('uploads/test.txt', 'Hola mundo');
+            $url = Storage::disk('s3')->temporaryUrl(
+                'uploads/test.txt',
+                now()->addMinutes(5)
+            );
+            $path = Storage::disk('s3')->path('uploads/test.txt');
+            $exists = Storage::disk('s3')->exists('uploads/test.txt');
+            $files = Storage::disk('s3')->files('uploads');
+            return response()->json([
+                'message' => 'Test S3',
+                'status' => 200,
+                'data' => [
+                    'url' => $url,
+                    'path' => $path,
+                    'exists' => $exists,
+                    'files' => $files,
+                ],
+            ]);
+        },
+    ]);
     // ... otras rutas
 });
 
