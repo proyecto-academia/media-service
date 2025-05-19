@@ -17,6 +17,19 @@ Route::get('/', [
 ]);
 
 
+Route::middleware('auth.remote')->group(function () {
+    Route::get('/orders', [
+        'uses' => function () {
+            return response()->json([
+                'message' => 'Orders',
+                'status' => 200,
+                'url' => request()->url(),
+                'path' => request()->path(),
+            ]);
+        },
+    ]);
+    // ... otras rutas
+});
 
 
 
