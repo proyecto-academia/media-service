@@ -20,14 +20,14 @@ Route::get('/', [
 
 Route::middleware('auth.remote')->group(function () {
     Route::post('/users/{id}/photo', [MediaController::class, 'uploadUserPhoto']);
-    Route::post('/class/{id}/video', [MediaController::class, 'uploadClassVideo']);
-    Route::post('/class/{id}/photo', [MediaController::class, 'uploadClassPhoto']);
-    Route::post('/course/{id}/photo', [MediaController::class, 'uploadCoursePhoto']);
+    Route::post('/classes/{id}/video', [MediaController::class, 'uploadClassVideo']);
+    Route::post('/classes/{id}/photo', [MediaController::class, 'uploadClassPhoto']);
+    Route::post('/courses/{id}/photo', [MediaController::class, 'uploadCoursePhoto']);
 
     Route::get('/users/{id}/photo', [MediaController::class, 'getUserPhoto']);
-    Route::get('/class/{id}/video', [MediaController::class, 'getClassVideo']);
-    Route::get('/class/{id}/photo', [MediaController::class, 'getClassPhoto']);
-    Route::get('/course/{id}/photo', [MediaController::class, 'getCoursePhoto']);
+    Route::get('/classes/{id}/video', [MediaController::class, 'getClassVideo']);
+    Route::get('/classes/{id}/photo', [MediaController::class, 'getClassPhoto']);
+    Route::get('/courses/{id}/photo', [MediaController::class, 'getCoursePhoto']);
 
 
     
