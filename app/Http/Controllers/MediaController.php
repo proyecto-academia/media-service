@@ -54,18 +54,18 @@ class MediaController extends ApiController
 
     public function uploadUserPhoto(Request $request, $id)
     {
-        $user = $request->get('auth_user');
-        if (!$user || !isset($user['id'])) {
-            return $this->error('User not authenticated', 401);
-        }
+        // $user = $request->get('auth_user');
+        // if (!$user || !isset($user['id'])) {
+        //     return $this->error('User not authenticated', 401);
+        // }
 
         if (!$request->hasFile('file')) {
             return $this->error('No file uploaded');
         }
 
-        if ($id != $user['id']) {
-            return $this->error('You cannot update another user photo', 403);
-        }
+        // if ($id != $user['id']) {
+        //     return $this->error('You cannot update another user photo', 403);
+        // }
 
         return $this->storeAndRespond($request, "uploads/users/{$id}/photo/");
     }

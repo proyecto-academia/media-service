@@ -28,7 +28,6 @@ class ValidateTokenWithAuthService
 
             
             if ($response->status() !== 200) {
-                dd($response->json());
                 return response()->json(['error' => 'Unauthorized - invalid token'], 401);
             }
 
