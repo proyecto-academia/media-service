@@ -13,7 +13,7 @@ class ValidateTokenWithAuthService
         $authHeader = $request->header('Authorization');
 
         if (!$authHeader || !str_starts_with($authHeader, 'Bearer ')) {
-            return response()->json(['error' => 'Unauthorized - token missing'], 401);
+            return response()->json(['error' => 'Unauthorized - token missing in header'], 401);
         }
 
         try {
@@ -22,8 +22,9 @@ class ValidateTokenWithAuthService
                 'Authorization' => $authHeader
             ])->get(env('AUTH_SERVICE_URL') . '/me');
 
-
+            
             if ($response->status() !== 200) {
+                dd($response->json());
                 return response()->json(['error' => 'Unauthorized - invalid token'], 401);
             }
 
