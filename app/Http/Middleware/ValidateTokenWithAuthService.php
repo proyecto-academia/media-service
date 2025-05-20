@@ -14,7 +14,6 @@ class ValidateTokenWithAuthService
         if (!$authHeader) {
             $authHeader = $request->header('authorization');
         }
-        dd($request, $authHeader);
 
 
         if (!$authHeader || !str_starts_with($authHeader, 'Bearer ')) {
