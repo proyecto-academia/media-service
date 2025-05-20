@@ -11,6 +11,10 @@ class ValidateTokenWithAuthService
     public function handle(Request $request, Closure $next)
     {
         $authHeader = $request->header('Authorization');
+        if (!$authHeader) {
+            $authHeader = $request->header('authorization');
+        }
+
 
         if (!$authHeader || !str_starts_with($authHeader, 'Bearer ')) {
             return response()->json(['error' => 'Unauthorized - token missing in header'], 401);
