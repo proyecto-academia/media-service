@@ -16,6 +16,8 @@ Route::get('/', [
         ]);
     },
 ]);
+Route::get('/courses/{id}/photo', [MediaController::class, 'getCoursePhoto']);
+
 
 
 Route::middleware('auth.remote')->group(function () {
@@ -27,7 +29,6 @@ Route::middleware('auth.remote')->group(function () {
     Route::get('/users/{id}/photo', [MediaController::class, 'getUserPhoto']);
     Route::get('/classes/{id}/video', [MediaController::class, 'getClassVideo']);
     Route::get('/classes/{id}/photo', [MediaController::class, 'getClassPhoto']);
-    Route::get('/courses/{id}/photo', [MediaController::class, 'getCoursePhoto']);
 
     //multiple
     Route::post('/courses/photos', [MediaController::class, 'getMultipleCoursePhotos']);
