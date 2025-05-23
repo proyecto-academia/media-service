@@ -123,4 +123,44 @@ class MediaController extends ApiController
     }
 
 
+    public function getMultipleCoursePhotos(Request $request)
+    {
+        $ids = $request->input('ids');
+
+        if (!is_array($ids) || empty($ids)) {
+            return $this->error('Invalid or empty list of course IDs', 400);
+        }
+
+        if(count($ids) > 25) {
+            return $this->error('Too many course IDs provided. Maximum is 25.', 400);
+        }
+
+        $results = [];
+
+        foreach ($ids as $id) {
+            $relativePath = "uploads/courses/{$id}/photo/";
+
+            $record = S3Object::where('path', $relativePath)->latest()->first();
+
+            if ($record) {
+                $fullKey = $record->path . $record->filename;
+
+                if (Storage::disk('s3')->exists($fullKey)) {
+                    $results[$id] = Storage::disk('s3')->temporaryUrl($fullKey, now()->addMinutes(15));
+                    continue;
+                }
+            }
+
+            // Si no existe en DB o S3
+            $results[$id] = null;
+        }
+
+        return $this->success($results);
+    }
+
+
+    
+
+
+
 }
