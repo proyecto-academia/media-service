@@ -57,6 +57,9 @@ class ValidateTokenWithAuthService
             $expiresAt = Carbon::parse($data['expires_at'])->setTimezone('UTC');
             $now = Carbon::now('UTC');
             $ttl = $expiresAt->timestamp - $now->timestamp; // segundos hasta expiración
+            if($ttl > 120){
+                $ttl = 120; // Limitar TTL a 2 minutos para evitar problemas de sincronización
+            }
             // dd('Auth user data from service', $data, 'TTL:', $ttl, 'now:', now(), 'expires_at:', $expiresAt);
             if ($ttl > 0) {
                 Redis::connection('shared')->setex($cacheKey, $ttl, json_encode($data));
