@@ -53,7 +53,7 @@ class ValidateTokenWithAuthService
             }
 
             // Guardar en Redis con TTL
-            $expiresAt = Carbon::parse($data['expires_at'])->setTimezone('UTC');
+            $expiresAt = Carbon::parse($data['data']['expires_at'])->setTimezone('UTC');
             $now = Carbon::now('UTC');
             $ttl = $expiresAt->timestamp - $now->timestamp; // segundos hasta expiración
             if($ttl > 120){
