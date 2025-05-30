@@ -2,12 +2,37 @@
 
 namespace App\Http\Controllers;
 
+use Deployer\Logger\Logger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use App\Models\S3Object;
 
 class MediaController extends ApiController
 {
+    private function removeRedisKey(string $redisKey){
+        if (app()->bound('redis')) {
+            app('redis')->del($redisKey);
+        }
+    }
+
+    private function storeRedisKey(string $redisKey, $data, int $ttl = 1800){
+        if (is_array($data) || is_object($data)) {
+            $data = json_encode($data);
+        }
+
+        if (!is_string($data)) {
+            throw new \InvalidArgumentException('Data must be a string, array, or object that can be JSON encoded.');
+        }
+
+        if (app()->bound('redis') && !empty($redisKey)) {
+            app('redis')->setex($redisKey, $ttl, $data);
+        }else{
+            Logger::error("Redis is not bound or redisKey is empty: {$redisKey}");
+        }
+
+
+    }
+
     private function storeAndRespond(Request $request, string $relativePath)
     {
         $file = $request->file('file');

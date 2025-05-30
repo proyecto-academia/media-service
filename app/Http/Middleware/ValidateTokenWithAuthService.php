@@ -22,7 +22,7 @@ class ValidateTokenWithAuthService
         $cacheKey = "jwt_valid:$token";
 
         // Buscar en Redis
-        if ($cached = Redis::get($cacheKey)) {
+        if ($cached = Redis::connection('shared')->get($cacheKey)) {
             $request->merge(['auth_user' => json_decode($cached, true)]);
             return $next($request);
         }
@@ -59,7 +59,7 @@ class ValidateTokenWithAuthService
             $ttl = $expiresAt->timestamp - $now->timestamp; // segundos hasta expiración
             // dd('Auth user data from service', $data, 'TTL:', $ttl, 'now:', now(), 'expires_at:', $expiresAt);
             if ($ttl > 0) {
-                Redis::setex($cacheKey, $ttl, json_encode($data));
+                Redis::connection('shared')->setex($cacheKey, $ttl, json_encode($data));
             }
 
             $request->merge(['auth_user' => $data]);
