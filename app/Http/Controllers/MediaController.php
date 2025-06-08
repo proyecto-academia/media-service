@@ -79,6 +79,15 @@ class MediaController extends ApiController
 
     private function checkPolicy(Request $request, string $policy, int $modelId): bool
     {
+        $redisKey = "policy:{$policy}:{$modelId}:{$request->get('auth_user')['data']['id']}";
+
+        // Check if the policy exists in Redis cache
+        if (app()->bound('redis') && app('redis')->exists($redisKey)) {
+            dd("Cache hit for key: {$redisKey}");
+            $cachedResponse = app('redis')->get($redisKey);
+            return json_decode($cachedResponse, true)['authorized'] === true;
+        }
+
         $authUrl = env('AUTH_SERVICE_URL') . '/check-policy';
 
         $response = Http::withToken($request->bearerToken())
@@ -87,7 +96,13 @@ class MediaController extends ApiController
                 'model_id' => $modelId,
             ]);
 
-        return $response->ok() && $response->json('data')['authorized'] === true;
+        if ($response->ok() && $response->json('data')['authorized'] === true) {
+            // Cache the response in Redis
+            $this->storeRedisKey($redisKey, $response->json('data'), 1800);
+            return true;
+        }
+
+        return false;
     }
 
 
