@@ -70,7 +70,6 @@ class MediaController extends ApiController
         $redisKey = "s3:{$relativePath}:{$record->filename}";
         if (app()->bound('redis') && app('redis')->exists($redisKey)) {
             $cachedResponse = app('redis')->get($redisKey);
-            dd($cachedResponse);
             return $this->success(json_decode($cachedResponse, true));
         }
 
