@@ -6,6 +6,8 @@ use Deployer\Logger\Logger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use App\Models\S3Object;
+use App\Http\Controllers\ApiController;
+use Illuminate\Support\Facades\Http;
 
 class MediaController extends ApiController
 {
@@ -75,6 +77,19 @@ class MediaController extends ApiController
         return $this->success(['url' => $url]);
     }
 
+    private function checkPolicy(Request $request, string $policy, int $modelId): bool
+    {
+        $authUrl = env('AUTH_SERVICE_URL') . '/check-policy';
+
+        $response = Http::withToken($request->bearerToken())
+            ->post($authUrl, [
+                'policy' => $policy,
+                'model_id' => $modelId,
+            ]);
+
+        return $response->ok() && $response->json('data')['allowed'] === true;
+    }
+
 
 
     public function uploadUserPhoto(Request $request, $id)
@@ -132,13 +147,21 @@ class MediaController extends ApiController
         return $this->fetchAndRespond("uploads/users/{$id}/photo/");
     }
 
-    public function getClassVideo($id)
+    public function getClassVideo(Request $request, $id)
     {
+        if (!$this->checkPolicy($request, 'showClass', $id)) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
         return $this->fetchAndRespond("uploads/classes/{$id}/video/");
     }
 
-    public function getClassPhoto($id)
+    public function getClassPhoto(Request $request, $id)
     {
+        if (!$this->checkPolicy($request, 'showClass', $id)) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
         return $this->fetchAndRespond("uploads/classes/{$id}/photo/");
     }
 
