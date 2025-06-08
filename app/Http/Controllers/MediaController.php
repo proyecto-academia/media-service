@@ -17,7 +17,7 @@ class MediaController extends ApiController
         }
     }
 
-    private function storeRedisKey(string $redisKey, $data, int $ttl = 1800){
+    private function storeRedisKey(string $redisKey, $data, int $ttl = 300){
         if (is_array($data) || is_object($data)) {
             $data = json_encode($data);
         }
@@ -53,6 +53,10 @@ class MediaController extends ApiController
 
         $url = Storage::disk('s3')->temporaryUrl($fullKey, now()->addMinutes(15));
 
+        //cachear la URL en Redis
+        $redisKey = "s3:{$relativePath}:{$filename}";
+        $this->storeRedisKey($redisKey, ['url' => $url], 300);
+
         return $this->success([
             'path' => $fullKey,
             'url' => $url,
@@ -61,7 +65,15 @@ class MediaController extends ApiController
 
     private function fetchAndRespond(string $relativePath)
     {
+        
         $record = S3Object::where('path', $relativePath)->latest()->first();
+        $redisKey = "s3:{$relativePath}:{$record->filename}";
+        if (app()->bound('redis') && app('redis')->exists($redisKey)) {
+            $cachedResponse = app('redis')->get($redisKey);
+            dd($cachedResponse);
+            return $this->success(json_decode($cachedResponse, true));
+        }
+
 
         if (!$record) {
             return $this->error('File not found in database', 404);
@@ -97,7 +109,7 @@ class MediaController extends ApiController
 
         if ($response->ok() && $response->json('data')['authorized'] === true) {
             // Cache the response in Redis
-            $this->storeRedisKey($redisKey, $response->json('data'), 1800);
+            $this->storeRedisKey($redisKey, $response->json('data'), ttl: 300);
             return true;
         }
 
