@@ -83,7 +83,6 @@ class MediaController extends ApiController
 
         // Check if the policy exists in Redis cache
         if (app()->bound('redis') && app('redis')->exists($redisKey)) {
-            dd("Cache hit for key: {$redisKey}");
             $cachedResponse = app('redis')->get($redisKey);
             return json_decode($cachedResponse, true)['authorized'] === true;
         }
