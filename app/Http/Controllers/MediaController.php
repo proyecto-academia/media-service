@@ -87,7 +87,7 @@ class MediaController extends ApiController
                 'model_id' => $modelId,
             ]);
 
-        return $response->ok() && $response->json('data')['allowed'] === true;
+        return $response->ok() && $response->json('data')['authorized'] === true;
     }
 
 
